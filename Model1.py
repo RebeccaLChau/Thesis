@@ -19,7 +19,7 @@ class Encoder(torch.nn.Module):
         self.relu4 = torch.nn.ReLU().to(device)
         self.conv5 = torch.nn.Conv2d(256, 512, kernel_size=4, stride=2, padding=1).to(device)
         self.relu5 = torch.nn.ReLU().to(device)
-        self.fc1 = torch.nn.Linear(131072, 4048).to(device)
+        self.fc1 = torch.nn.Linear(512*15*15, 4048).to(device)
         self.fc2 = torch.nn.Linear(4048, 2 * latent_dimension).to(device)
         self.latent_dimension = latent_dimension
         
@@ -47,7 +47,7 @@ class Decoder(torch.nn.Module):
         super(Decoder, self).__init__()
         
         self.fc1 = torch.nn.Linear(latent_dimension, 4048).to(device)
-        self.fc2 = torch.nn.Linear(4048, 131072).to(device)
+        self.fc2 = torch.nn.Linear(4048, 512*15*15).to(device)
         self.conv1 = torch.nn.ConvTranspose2d(512, 256, kernel_size=4, stride=2, padding=1).to(device)
         self.relu1 = torch.nn.ReLU().to(device)
         self.conv2 = torch.nn.ConvTranspose2d(256, 128, kernel_size=4, stride=2, padding=1).to(device)
@@ -61,14 +61,15 @@ class Decoder(torch.nn.Module):
     def forward(self, z):
         x = torch.nn.functional.relu(self.fc1(z))
         x = torch.nn.functional.relu(self.fc2(x))
-        x = x.view(-1, 512, 16, 16)
+        x = x.view(-1, 512, 15, 15)
         x = self.conv1(x)
         x = self.relu1(x)
         x = self.conv2(x)
         x = self.relu2(x)
+        x = self.conv3(x)
+        x = self.relu3(x)
         x = self.conv4(x)
         x = self.relu4(x)
-        x = self.conv5(x)
         x = torch.sigmoid(self.conv5(x))
         return x
     
