@@ -1,8 +1,8 @@
-# from sklearn.model_selection import KFold
-# import numpy as np
-# import torch
-# import Model1 as Model
-# import matplotlib.pyplot as plt
+from sklearn.model_selection import KFold
+import numpy as np
+import torch
+import Model1 as Model
+import matplotlib.pyplot as plt
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
