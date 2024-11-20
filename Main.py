@@ -17,7 +17,7 @@ torch.cuda.memory_summary(device=None, abbreviated=False)
 
 # In[2]: Load the data
 
-path_dataset = 'F:\Full test cropped'
+path_dataset = '/data/leuven/369/vsc36918/Full/Full test cropped'
 transformation = transforms.Compose([transforms.Resize((500, 500)), transforms.ToTensor()])
 dataset = datasets.ImageFolder(root=path_dataset, transform=transformation)
 
@@ -27,9 +27,9 @@ test_loader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=False,
 
 # In[3]: Train the model
 
-latent_dimension = 100  
+latent_dimension = 128
 beta = 1
-num_epochs = 2
+num_epochs = 10
 
 vae = Model.VAE(latent_dimension=latent_dimension, beta=beta)
 vae = Train.cross_validate_vae(vae, trainingset, num_epochs, beta, k_folds=10, latent_dimension=latent_dimension)
@@ -40,8 +40,10 @@ with torch.no_grad():
         x = torch.autograd.Variable(x)
         x_hat,_,_ = vae(x)
         break
-
-torch.save(vae.state_dict(), 'F:\Full Results')
+save_path = '/data/leuven/369/vsc36918/Full Results'
+fname = 'vae_model'  # You can customize this based on parameters like `latent_dimension` or `num_epochs`
+torch.save(vae.state_dict(), save_path + 'state_' + fname + '.st')
+torch.save(vae, save_path + fname + '.pth')
 
 _, mu, lv = vae.forward(x)
 z = vae.reparameterize(mu,lv)
