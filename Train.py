@@ -1,10 +1,8 @@
-"Train"
-
-from sklearn.model_selection import KFold
-import numpy as np
-import torch
-import Model1 as Model
-import matplotlib.pyplot as plt
+# from sklearn.model_selection import KFold
+# import numpy as np
+# import torch
+# import Model1 as Model
+# import matplotlib.pyplot as plt
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -50,7 +48,7 @@ def cross_validate_vae(vae, data, num_epochs, beta, k_folds, latent_dimension):
  
     fold_metrics = []
 
-    vae = Model.VAE(latent_dimension, beta).to(device)
+    vae = Model.VAE(latent_dimension, beta).to(device)  
     Loss_plot = []
     re_plot = []
     kl_plot = []
