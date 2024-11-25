@@ -27,12 +27,12 @@ test_loader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=False,
 
 # In[3]: Train the model
 
-latent_dimension = 50
+latent_dimension = 128
 beta = 1
-num_epochs = 1000
+num_epochs = 10
 
 vae = Model.VAE(latent_dimension=latent_dimension, beta=beta)
-vae = Train.cross_validate_vae(vae, trainingset, num_epochs, beta, k_folds=10, latent_dimension=latent_dimension)
+vae = Train.train_vae(vae, trainingset, num_epochs, beta, k_folds=10, latent_dimension=latent_dimension)
 
 with torch.no_grad():
     for x, _ in test_loader:
