@@ -10,7 +10,7 @@ import scipy.stats
 
 # In[1]: Enable CPUs for faster training the model
 device = "cuda" if torch.cuda.is_available() else "cpu"
-kwargs = {'num_workers': 0, 'pin_memory': True} if device=='cuda' else {}
+kwargs = {'num_workers': 4, 'pin_memory': True} if device=='cuda' else {}
 torch.cuda.empty_cache()
 
 torch.cuda.memory_summary(device=None, abbreviated=False)
@@ -27,9 +27,9 @@ test_loader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=False,
 
 # In[3]: Train the model
 
-latent_dimension = 128
+latent_dimension = 50
 beta = 1
-num_epochs = 10
+num_epochs = 1000
 
 vae = Model.VAE(latent_dimension=latent_dimension, beta=beta)
 vae = Train.cross_validate_vae(vae, trainingset, num_epochs, beta, k_folds=10, latent_dimension=latent_dimension)
