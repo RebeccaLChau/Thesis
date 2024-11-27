@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-kwargs = {'num_workers': 0, 'pin_memory': True} if device=='cuda' else {}
+kwargs = {'num_workers': 4, 'pin_memory': True} if device=='cuda' else {}
 
 def train_vae(vae, train_loader, num_epochs, beta):
     optimizer = torch.optim.Adam(vae.parameters(), lr=1e-4)
