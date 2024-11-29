@@ -24,7 +24,7 @@ dataset = datasets.ImageFolder(root=path_dataset, transform=transformation)
 trainingset, testset = torch.utils.data.random_split(dataset, [int(len(dataset)*0.99), len(dataset)-int(len(dataset)*0.99)])
 
 test_loader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=False, drop_last=True, pin_memory=False)
-train_loader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=False, drop_last=True, pin_memory=False)
+train_loader = torch.utils.data.DataLoader(trainingset, batch_size=64, shuffle=False, drop_last=True, pin_memory=False)
 # In[3]: Train the model
 
 latent_dimension = 64
