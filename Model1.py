@@ -1,107 +1,68 @@
 "Beta-Variational Autoencoder (model)"
 import torch
 
-# Set up device
 device = "cuda" if torch.cuda.is_available() else "cpu"
+kwargs = {'num_workers': 4, 'pin_memory': True} if device == 'cuda' else {}
 
-# Encoder Class
 class Encoder(torch.nn.Module):
     def __init__(self, latent_dimension):
         super(Encoder, self).__init__()
-
-        # Adjust convolution layers to ensure output size matches 512 x 16 x 16
-        self.conv1 = torch.nn.Conv2d(3, 16, kernel_size=4, stride=2, padding=1)
-        self.relu1 = torch.nn.ReLU()
-        
-        self.conv2 = torch.nn.Conv2d(16, 64, kernel_size=4, stride=2, padding=1)
-        self.relu2 = torch.nn.ReLU()
-        
-        self.conv3 = torch.nn.Conv2d(64, 128, kernel_size=4, stride=2, padding=1)
-        self.relu3 = torch.nn.ReLU()
-        
-        self.conv4 = torch.nn.Conv2d(128, 256, kernel_size=4, stride=2, padding=1)
-        self.relu4 = torch.nn.ReLU()
-        
-        self.conv5 = torch.nn.Conv2d(256, 512, kernel_size=3, stride=2, padding=1)  # Changed kernel to 3 to match 16x16 output
-        self.relu5 = torch.nn.ReLU()
-        
-        # Update fully connected layer to match output dimensions of 512 * 16 * 16
-        self.fc1 = torch.nn.Linear(512 * 16 * 16, 4048)
-        self.fc2 = torch.nn.Linear(4048, 2 * latent_dimension)
+        self.conv1 = torch.nn.Conv2d(3, 16, kernel_size=4, stride=2, padding=1).to(device)  # 250x250
+        self.relu1 = torch.nn.ReLU().to(device)
+        self.conv2 = torch.nn.Conv2d(16, 64, kernel_size=4, stride=2, padding=1).to(device)  # 125x125
+        self.relu2 = torch.nn.ReLU().to(device)
+        self.conv3 = torch.nn.Conv2d(64, 128, kernel_size=4, stride=2, padding=1).to(device)  # 63x63
+        self.relu3 = torch.nn.ReLU().to(device)
+        self.conv4 = torch.nn.Conv2d(128, 256, kernel_size=4, stride=2, padding=1).to(device)  # 32x32
+        self.relu4 = torch.nn.ReLU().to(device)
+        self.conv5 = torch.nn.Conv2d(256, 512, kernel_size=4, stride=2, padding=1).to(device)  # 16x16
+        self.relu5 = torch.nn.ReLU().to(device)
+        self.fc1 = torch.nn.Linear(512 * 16 * 16, 4096).to(device)
+        self.fc2 = torch.nn.Linear(4096, 2 * latent_dimension).to(device)
         self.latent_dimension = latent_dimension
 
     def forward(self, x):
-        x = self.conv1(x)
-        print("After conv1:", x.shape)
-        x = self.relu1(x)
-        
-        x = self.conv2(x)
-        print("After conv2:", x.shape)
-        x = self.relu2(x)
-        
-        x = self.conv3(x)
-        print("After conv3:", x.shape)
-        x = self.relu3(x)
-        
-        x = self.conv4(x)
-        print("After conv4:", x.shape)
-        x = self.relu4(x)
-        
-        x = self.conv5(x)
-        print("After conv5:", x.shape)  # Should print (batch_size, 512, 16, 16)
-        x = self.relu5(x)
-        
-        x = x.view(x.size(0), -1)
-        print("After flatten:", x.shape)  # Should print (batch_size, 512*16*16 = 131072)
-        
+        x = self.relu1(self.conv1(x))
+        x = self.relu2(self.conv2(x))
+        x = self.relu3(self.conv3(x))
+        x = self.relu4(self.conv4(x))
+        x = self.relu5(self.conv5(x))
+        x = x.view(x.size(0), -1)  # Flatten
         x = torch.nn.functional.relu(self.fc1(x))
         z = self.fc2(x)
-        
         z_mean = z[:, :self.latent_dimension]
         z_logvar = z[:, self.latent_dimension:]
         return z_mean, z_logvar
 
-# Decoder Class
+
 class Decoder(torch.nn.Module):
     def __init__(self, latent_dimension):
         super(Decoder, self).__init__()
-
-        self.fc1 = torch.nn.Linear(latent_dimension, 4048)
-        self.fc2 = torch.nn.Linear(4048, 512 * 16 * 16)  # Match dimensions of encoder's flatten output
-        
-        self.conv1 = torch.nn.ConvTranspose2d(512, 256, kernel_size=4, stride=2, padding=1)
-        self.relu1 = torch.nn.ReLU()
-        self.conv2 = torch.nn.ConvTranspose2d(256, 128, kernel_size=4, stride=2, padding=1)
-        self.relu2 = torch.nn.ReLU()
-        self.conv3 = torch.nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1)
-        self.relu3 = torch.nn.ReLU()
-        self.conv4 = torch.nn.ConvTranspose2d(64, 16, kernel_size=4, stride=2, padding=1)
-        self.relu4 = torch.nn.ReLU()
-        self.conv5 = torch.nn.ConvTranspose2d(16, 3, kernel_size=4, stride=2, padding=1)
-        self.upsample = torch.nn.Upsample(size=(500, 500), mode='bilinear', align_corners=False)  # Final output to match input size
+        self.fc1 = torch.nn.Linear(latent_dimension, 4096).to(device)
+        self.fc2 = torch.nn.Linear(4096, 512 * 16 * 16).to(device)
+        self.conv1 = torch.nn.ConvTranspose2d(512, 256, kernel_size=4, stride=2, padding=1).to(device)  # 32x32
+        self.relu1 = torch.nn.ReLU().to(device)
+        self.conv2 = torch.nn.ConvTranspose2d(256, 128, kernel_size=4, stride=2, padding=1).to(device)  # 64x64
+        self.relu2 = torch.nn.ReLU().to(device)
+        self.conv3 = torch.nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1).to(device)  # 125x125
+        self.relu3 = torch.nn.ReLU().to(device)
+        self.conv4 = torch.nn.ConvTranspose2d(64, 16, kernel_size=4, stride=2, padding=1).to(device)  # 250x250
+        self.relu4 = torch.nn.ReLU().to(device)
+        self.conv5 = torch.nn.ConvTranspose2d(16, 3, kernel_size=4, stride=2, padding=1).to(device)  # 500x500
+        self.sigmoid = torch.nn.Sigmoid().to(device)
 
     def forward(self, z):
         x = torch.nn.functional.relu(self.fc1(z))
         x = torch.nn.functional.relu(self.fc2(x))
-        print("Before reshaping:", x.shape)
-        
         x = x.view(-1, 512, 16, 16)
-        print("After reshaping:", x.shape)
-        
-        x = self.conv1(x)
-        x = self.relu1(x)
-        x = self.conv2(x)
-        x = self.relu2(x)
-        x = self.conv3(x)
-        x = self.relu3(x)
-        x = self.conv4(x)
-        x = self.relu4(x)
-        
-        x = torch.sigmoid(self.conv5(x))
-        x = self.upsample(x)  # Upsample to 500x500
+        x = self.relu1(self.conv1(x))
+        x = self.relu2(self.conv2(x))
+        x = self.relu3(self.conv3(x))
+        x = self.relu4(self.conv4(x))
+        x = self.sigmoid(self.conv5(x))
         return x
 
-# VAE Class
+
 class VAE(torch.nn.Module):
     def __init__(self, latent_dimension, beta):
         super(VAE, self).__init__()
@@ -129,12 +90,4 @@ class VAE(torch.nn.Module):
     def decode(self, z):
         return self.decoder(z)
 
-# Instantiate the VAE model and move to device
-latent_dimension = 64
-beta = 1.0
-model = VAE(latent_dimension, beta).to(device)
-
-# Test with a sample input
-x = torch.randn(1, 3, 500, 500).to(device)  # Example input: batch size 1, 3 channels, 500x500 resolution
-x_reconstructed, z_mean, z_logvar = model(x)
 
