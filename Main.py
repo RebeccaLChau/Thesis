@@ -25,6 +25,13 @@ trainingset, testset = torch.utils.data.random_split(dataset, [int(len(dataset)*
 
 test_loader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=False, drop_last=True, pin_memory=False)
 train_loader = torch.utils.data.DataLoader(trainingset, batch_size=64, shuffle=False, drop_last=True, pin_memory=False)
+
+for batch_idx, (data, _) in enumerate(train_loader):
+    print(f"Batch index: {batch_idx}")
+    print(f"Data shape: {data.shape}")
+    break
+
+
 # In[3]: Train the model
 
 latent_dimension = 64
@@ -32,7 +39,7 @@ beta = 1
 num_epochs = 10 
 
 vae = Model.VAE(latent_dimension=latent_dimension, beta=beta).to(device)
-vae = Train.train_vae(vae, train_loader, num_epochs, beta)
+vae, _, _, _ = Train.train_vae(vae, train_loader, num_epochs, beta)
 
 with torch.no_grad():
     for x, _ in test_loader:
@@ -74,4 +81,3 @@ torch.save(vae, save_path + fname + '.pth')
 #        axes[i][j].imshow(tnew[k].permute((1,2,0)).detach().cpu().numpy(), interpolation='lanczos')
 #        k+=1
 #plt.show()
-
