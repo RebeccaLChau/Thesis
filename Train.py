@@ -21,7 +21,6 @@ def train_vae(vae, train_loader, num_epochs, beta):
         total_kl_divergence = 0
 
         for batch_idx, (data_training, _) in enumerate(train_loader):
-            # print(batch_idx)
             data_training = data_training.to(device)
             optimizer.zero_grad()
 
@@ -41,7 +40,8 @@ def train_vae(vae, train_loader, num_epochs, beta):
         kl.append(total_kl_divergence / len(train_loader.dataset))
         print('Epoch [{}/{}], Loss: {:.3f}'.format(epoch+1, num_epochs, total_loss / len(train_loader.dataset)))
 
-    return Losses, reconstruction, kl
+    return vae, Losses, reconstruction, kl
+
 
 def cross_validate_vae(vae, data, num_epochs, beta, k_folds, latent_dimension):
     kf = KFold(n_splits=k_folds, shuffle=True)
