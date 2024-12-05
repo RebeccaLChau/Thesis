@@ -17,7 +17,7 @@ torch.cuda.memory_summary(device=None, abbreviated=False)
 
 # In[2]: Load the data
 
-path_dataset = '/data/leuven/369/vsc36918/Full/Full test cropped'
+path_dataset = '/data/leuven/369/vsc36918/Full/Fullcropped'
 transformation = transforms.Compose([transforms.Resize((500, 500)), transforms.ToTensor()])
 dataset = datasets.ImageFolder(root=path_dataset, transform=transformation)
 
@@ -36,7 +36,7 @@ for batch_idx, (data, _) in enumerate(train_loader):
 
 latent_dimension = 64
 beta = 1
-num_epochs = 10 
+num_epochs = 1000 
 
 vae = Model.VAE(latent_dimension=latent_dimension, beta=beta).to(device)
 vae, _, _, _ = Train.train_vae(vae, train_loader, num_epochs, beta)
@@ -47,7 +47,7 @@ with torch.no_grad():
         x = torch.autograd.Variable(x)
         x_hat,_,_ = vae(x)
         break
-save_path = '/data/leuven/369/vsc36918/Full Results'
+save_path = '/data/leuven/369/vsc36918/LD64E1000'
 fname = 'vae_model'  # You can customize this based on parameters like `latent_dimension` or `num_epochs`
 torch.save(vae.state_dict(), save_path + 'state_' + fname + '.st')
 torch.save(vae, save_path + fname + '.pth')
