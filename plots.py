@@ -1,5 +1,5 @@
 """
-call: run vae_multi_infer.py
+#call: run vae_multi_infer.py
 
 ## BOTTLENECK VARIABLES:
 ## mu = Mean
@@ -43,12 +43,12 @@ print('Read data: '+t0)
 
 ## DIRECTORIES
 img_path = '/data/leuven/369/vsc36918/Full/Fullcropped' 
-model_path = '/data/leuven/369/vsc36918/LD64E1000'
+model_path = '/data/leuven/369/vsc36918/LD64E1000' #pth
 #-----------------------------------------------------------------------------#
 #    DATA LOADER                                                              #
 #-----------------------------------------------------------------------------#
 
-batchsz    = 64  #changed to patch main
+batchsz    = 180  #changed to patch main
 trainpctg  = 0.5 #data used for training
 
 dataset = datasets.ImageFolder(
@@ -126,13 +126,13 @@ else:
 # TRAINED MODELS                                                               #
 #----------------------------------------------------------------------------- #
 print('--------------------------------------------------------------')
-import vae_model_ext as vaemodel #check which one
+import vae_model_ext as vaemodel #check which one - model1 - architecture
 
 ## large flare dataset
 # FNAME = 'vae_flares_Br_beta25_lt006_bz200_splt50_ep1000_lr5e-4'  #change images
 # FNAME = 'vae_flares_Br_beta25_lt006_bz300_splt50_ep1000_lr5e-4_ext'
 # FNAME = 'vae_flares_Br_beta25_lt018_bz300_splt50_ep1000_lr5e-4_ext'
-FNAME = 'vae_flares_Br_beta25_lt036_bz100_splt50_ep1000_lr5e-4_ext'
+FNAME = 'vae_flares_Br_beta25_lt036_bz100_splt50_ep1000_lr5e-4_ext' #this is for model
 
 # FNAME = 'VSC/vae_flares_Br_beta25_lt018_bz100_splt50_ep1000_lr5e-4'
 
@@ -183,7 +183,7 @@ t = model(x)
 # ============================================================================ #
 csfont = {'fontname':'Times New Roman'}
 
-img1 = x[140].permute((1,2,0))[:,:,comp].detach().numpy()
+img1 = x[140].permute((1,2,0))[:,:,comp].detach().numpy() #change to match batch size
 img2 = x[150].permute((1,2,0))[:,:,comp].detach().numpy()
 img3 = x[160].permute((1,2,0))[:,:,comp].detach().numpy()
 
