@@ -42,13 +42,13 @@ print('Read data: '+t0)
 
 
 ## DIRECTORIES
-img_path = '/data/leuven/369/vsc36918/Full/Fullcropped' 
-model_path = '/data/leuven/369/vsc36918/LD64E1000' #pth
+img_path = 'F:\Full test cropped' 
+model_path = r'C:\Users\reb\Documents\Models'
 #-----------------------------------------------------------------------------#
 #    DATA LOADER                                                              #
 #-----------------------------------------------------------------------------#
 
-batchsz    = 180  #changed to patch main
+batchsz    = 180  #changed to match below
 trainpctg  = 0.5 #data used for training
 
 dataset = datasets.ImageFolder(
@@ -126,13 +126,13 @@ else:
 # TRAINED MODELS                                                               #
 #----------------------------------------------------------------------------- #
 print('--------------------------------------------------------------')
-import vae_model_ext as vaemodel #check which one - model1 - architecture
+import Model1 as vaemodel #check which one - model1 - architecture
 
 ## large flare dataset
 # FNAME = 'vae_flares_Br_beta25_lt006_bz200_splt50_ep1000_lr5e-4'  #change images
 # FNAME = 'vae_flares_Br_beta25_lt006_bz300_splt50_ep1000_lr5e-4_ext'
 # FNAME = 'vae_flares_Br_beta25_lt018_bz300_splt50_ep1000_lr5e-4_ext'
-FNAME = 'vae_flares_Br_beta25_lt036_bz100_splt50_ep1000_lr5e-4_ext' #this is for model
+FNAME = 'LD64E1000vae_model.pth' #this is for model
 
 # FNAME = 'VSC/vae_flares_Br_beta25_lt018_bz100_splt50_ep1000_lr5e-4'
 
@@ -385,6 +385,8 @@ plt.rcParams.update({'font.size': 45})
 # plt.show(block=False)
 plt.savefig('gen_figs/vae_fig02_'+FNAME[4:53]+'.png', bbox_inches='tight')
 plt.close()
+
+
 
 
 
