@@ -1,0 +1,99 @@
+import os
+
+import numpy as numpy
+import torch
+import torch.nn.functional as F
+from torch import nn
+from torch.utils.data import DataLoader, random_split
+import pytorch_lightning as pl
+
+import sys
+import datetime
+
+from torchvision import datasets, transforms
+
+pl.seed_everything()
+
+## track time
+t0 = str(datetime.datetime.today())
+print('Read data: '+t0)
+
+## DIRECTORIES with datasets
+# This is where your data lives (images) [!!!]
+img_path = ''
+
+#-----------------------------------------------------------------------------#
+#    DATA LOADER                                                              #
+#-----------------------------------------------------------------------------#
+
+batchsz    = 100
+trainpctg  = 0.8 #trainingsplit want to train evaluate on 20% of data
+
+
+dataset = datasets.ImageFolder(
+    img_path,
+    transforms.Compose([
+        transforms.Resize((250, 500)), # transforms.Resize((hight, width))
+        transforms.ToTensor(),
+        transforms.Normalize(
+              mean=[0., 0., 0.],
+              std=[1., 1.0, 1.0])
+]))
+
+
+trainset, testset = random_split(dataset, [int(trainpctg*len(dataset)), len(dataset)-int(trainpctg*len(dataset))])
+print('Len: ', len(dataset), len(trainset), len(testset))
+
+#sys.exit()
+
+smallsz     = 50
+subidx      = numpy.random.choice(len(trainset), smallsz, replace=False)
+trainsubset = torch.utils.data.Subset(trainset, subidx)
+subidx      = numpy.random.choice(len(testset),  smallsz, replace=False)
+testsubset  = torch.utils.data.Subset(testset, subidx)
+
+
+large = True
+
+if large:
+    dataloader = DataLoader(trainset, batch_size=batchsz, shuffle=True, drop_last=True, num_workers=13)
+    testloader = DataLoader(testset , batch_size=batchsz, shuffle=False, drop_last=True, num_workers=12)
+else:
+    dataloader = DataLoader(trainsubset, batch_size=1, shuffle=True, num_workers=12)
+    testloader = DataLoader(testsubset , batch_size=1, shuffle=False, num_workers=12)
+
+print(dataset)
+print(dataloader)
+print("Min/Max:", dataset[0][0].min(), dataset[0][0].max())
+
+
+## track time
+t1 = str(datetime.datetime.today())
+print('Start training: '+t1)
+
+## Import working model / N.B.
+import vae_model_fulldisk as vaemodel #othercodesent
+model = vaemodel.vaelmodel1()
+# print(model)
+
+# sys.exit()
+
+# Give a name to your model [!!!]
+fname = '' #givenameformodel
+
+logger = pl.loggers.TensorBoardLogger('lightning_logs', 'vaelog/'+fname)
+trainer = pl.Trainer(accelerator="auto", devices=1, max_epochs=1000, check_val_every_n_epoch=10, log_every_n_steps=100, logger=logger)
+trainer.fit(model, train_dataloaders=dataloader, val_dataloaders=testloader, ckpt_path="last")
+trainer.save_checkpoint("last")
+
+## SAVE Trained MODEL 
+# Give a path and check that the name of your model how you want to save it [!!!]
+save_path =''
+torch.save(model.state_dict(), save_path+'state_'+fname+'.st') # weights
+torch.save(model, save_path+fname+'.pth') # trained model
+print('Model saved:'+fname)
+
+
+## Counter
+t2 = str(datetime.datetime.today())
+print('Finish and saved: '+t2)
