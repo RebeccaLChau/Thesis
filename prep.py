@@ -112,7 +112,7 @@ print('--------------------------------------------------------------')
 import vae_model_ext as vaemodel #check which model
 
 ## large flare dataset
-FNAME = 'vae_flares_Br_beta25_lt006_bz200_splt50_ep1000_lr5e-4' #change images
+FNAME = 'vae_flares_Br_beta25_lt006_bz200_splt50_ep1000_lr5e-4' 
 # FNAME = 'vae_flares_Br_beta25_lt006_bz300_splt50_ep1000_lr5e-4_ext'
 # FNAME = 'vae_flares_Br_beta25_lt018_bz300_splt50_ep1000_lr5e-4_ext'
 # FNAME = 'vae_flares_Br_beta25_lt036_bz100_splt50_ep1000_lr5e-4_ext'
@@ -153,9 +153,9 @@ print(z.detach().numpy())
 latdim = len(z[0])
 sNum = len(setloader)
 
-# vae_lvec = numpy.empty([sNum, latdim], dtype = float)
-# vae_mu = numpy.empty([sNum, latdim], dtype = float)
-# vae_sd = numpy.empty([sNum, latdim], dtype = float)
+vae_lvec = numpy.empty([sNum, latdim], dtype = float)
+vae_mu = numpy.empty([sNum, latdim], dtype = float)
+vae_sd = numpy.empty([sNum, latdim], dtype = float)
 
 # dist = numpy.empty([sNum, latdim, 80], dtype = float)
 
@@ -206,9 +206,9 @@ for i, (x,_) in enumerate(setloader):
     # org_total[i] = (numpy.sum(x.detach().numpy()))/3.
     # gen_total[i] = (numpy.sum(t[0].detach().numpy()))/3.
 
-    # z0 = (z.detach().numpy())[0]
-    # m0 = mu.detach().numpy()
-    # sd0  = torch.exp(lvar*0.5).detach().numpy()
+    z0 = (z.detach().numpy())[0]
+    m0 = mu.detach().numpy()
+    sd0  = torch.exp(lvar*0.5).detach().numpy()
 
     # ## I am trying something
     # m = numpy.array([[j for j in numpy.arange(-4,4,0.1)] for i in range(len(mu))])
@@ -254,8 +254,8 @@ if os.path.exists(path):
     hdu = fits.PrimaryHDU(data=vae_mu)
     hdu.writeto(path+'Mu_'+FNAME+'.fits',overwrite=True)
 
-    hdu = fits.PrimaryHDU(data=vae_sd)
-    hdu.writeto(path+'Std_'+FNAME+'.fits',overwrite=True)
+  #  hdu = fits.PrimaryHDU(data=vae_sd)
+  # hdu.writeto(path+'Std_'+FNAME+'.fits',overwrite=True)
 
     hdu = fits.PrimaryHDU(data=dist)
     hdu.writeto(path+'Dist_'+FNAME+'.fits',overwrite=True)
